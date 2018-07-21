@@ -19,6 +19,8 @@ var (
 	Transforms = map[string]Transform{
 		"db.archmap:0":    pathTransform,
 		"db.archmap:1":    pathTransform,
+		"db.change:7":     pathTransform,
+		"db.changex:7":    pathTransform,
 		"db.depot:0":      identTransform,
 		"db.depot:3":      Transform{From: "^%s/", To: "%s/"},
 		"db.domain:0":     identTransform,
