@@ -15,6 +15,12 @@ This code is provided as-is, with no warranty. The author(s) take no responsbili
 - It has only been tested against a full checkpoint. **It may not work against journal data.**
 - It has only been tested against a depot with the standard mapping. If your depot's Map is not the default ie. `<depotname>/...`, you may wish to change it before proceeding.
 
+## Installation
+
+```
+go install github.com/rpetti/p4-depot-renamer
+```
+
 ## How to Use
 
 1. Take a full checkpoint and backup of your server, just in case!
