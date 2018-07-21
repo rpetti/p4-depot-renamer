@@ -68,8 +68,10 @@ func main() {
 		return
 	}
 
-	parserChannel := make(chan JournalLine)
-	go readCheckpoint(parserChannel)
-	linePrinter(parserChannel)
+	readerOut := make(chan JournalLine)
+	transOut := make(chan JournalLine)
+	go readCheckpoint(readerOut)
+	go transformer(readerOut, transOut, *depotFrom, *depotTo)
+	linePrinter(transOut)
 
 }

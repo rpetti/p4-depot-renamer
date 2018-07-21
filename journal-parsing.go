@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 )
 
@@ -35,6 +36,11 @@ type lineScanner struct {
 	Idx    int
 	Reader *bufio.Reader
 	Raw    bytes.Buffer
+}
+
+func (je *JournalElem) applyTransform(from string, to string) {
+	re := regexp.MustCompile(from)
+	je.Data = re.ReplaceAllString(je.Data, to)
 }
 
 func (ls *lineScanner) read() rune {
