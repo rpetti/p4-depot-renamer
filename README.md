@@ -24,7 +24,7 @@ go install github.com/rpetti/p4-depot-renamer
 ## How to Use
 
 1. Do a full `p4 verify -q //...` and fix any issues.
-2. Take a full checkpoint and backup of your server, just in case!
+2. **Take a full checkpoint and backup of your server.**
 3. Stop p4d.
 4. Remove db.* files.
 5. If the latest checkpoint is compressed, uncompress it. `gunzip checkpoint.###.gz`
