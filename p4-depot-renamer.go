@@ -40,13 +40,20 @@ func readCheckpoint(c chan<- JournalLine) {
 	}
 }
 
-func linePrinter(c <-chan JournalLine) {
+func lineWriter(c <-chan JournalLine) {
+	f, err := os.Create(*checkpointOutputFileName)
+	if err != nil {
+		log.Fatalf("error opening output file: %v", err)
+	}
+	defer f.Close()
+	w := bufio.NewWriter(f)
 	for line := range c {
 		if line.EndOfFile {
 			break
 		}
-		fmt.Println(line)
+		w.WriteString(fmt.Sprintln(line))
 	}
+	w.Flush()
 }
 
 func main() {
@@ -72,6 +79,6 @@ func main() {
 	transOut := make(chan JournalLine)
 	go readCheckpoint(readerOut)
 	go transformer(readerOut, transOut, *depotFrom, *depotTo)
-	linePrinter(transOut)
+	lineWriter(transOut)
 
 }
