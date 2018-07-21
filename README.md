@@ -12,7 +12,7 @@ This code is provided as-is, with no warranty. The author(s) take no responsbili
 
 - This tool has only been tested against standard depots. Graph, Stream, and Remote depots will likely not work!
 - It has only been tested against a full checkpoint. It may not work against journal data.
-- It has only been tested against a depot with the standard mapping. If your depot mapping is not the default ie. `<depotname>/...`, you may wish to change it before proceeding.
+- It has only been tested against a depot with the standard mapping. If your depot's Map is not the default ie. `<depotname>/...`, you may wish to change it before proceeding.
 
 ## How to Use
 
