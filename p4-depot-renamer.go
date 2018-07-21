@@ -79,10 +79,13 @@ func main() {
 		return
 	}
 
+	log.Printf("will read and transform %s", *checkpointFileName)
+	log.Printf("renaming depot \"%s\" to \"%s\"...", *depotFrom, *depotTo)
 	readerOut := make(chan JournalLine)
 	transOut := make(chan JournalLine)
 	go readCheckpoint(readerOut)
 	go transformer(readerOut, transOut, *depotFrom, *depotTo)
 	lineWriter(transOut)
 
+	log.Printf("transforms have been applied and saved to %s, you can now use it to restore your database", *checkpointOutputFileName)
 }
