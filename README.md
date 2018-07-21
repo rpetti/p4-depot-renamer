@@ -23,16 +23,19 @@ go install github.com/rpetti/p4-depot-renamer
 
 ## How to Use
 
-1. Take a full checkpoint and backup of your server, just in case!
-2. Make sure the server (p4d) is not running.
-3. Remove db.* files.
-4. Un-gzip the latest checkpoint file.
-5. Run the tool against the checkpoint file with the necessary options. (outlined below)
-6. Restore the checkpoint. `p4d -r . -jr checkpoint.renamed`
-7. Run database verification tests. `p4d -r . -xv`
-8. Move the lbr/versioned files for the renamed depot. For example, if you renamed 'depot' to 'myproduct', then rename the 'depot' directory in the P4ROOT to 'myproduct'.
-9. Bring the server back online. `p4d -r . -p <port>`
-10. Run a full lbr verification. `p4 verify -q //...`
+1. Do a full `p4 verify -q //...` and fix any issues.
+2. Take a full checkpoint and backup of your server, just in case!
+3. Stop p4d.
+4. Remove db.* files.
+5. If the latest checkpoint is compressed, uncompress it. `gunzip checkpoint.###.gz`
+6. Run the tool against the checkpoint file with the necessary options. (outlined below)
+7. Restore the checkpoint. `p4d -r . -jr checkpoint.renamed`
+8. Run database verification tests. `p4d -r . -xv`
+9. Move the lbr/versioned files for the renamed depot. For example, if you renamed `depot` to `myproduct`, then rename the `depot` directory in the P4ROOT to `myproduct`.
+10. Bring the server back online. `p4d -r . -p <port>`
+11. Run a full lbr verification. `p4 verify -q //...`
+
+**Note**: It's likely that verify will encounter "BAD" files at this point. This is likely because of `$Id$` tags in the files messing up the calculated checksum since the path has changed. In order to fix these, you'll need to run `p4 verify -qv //newdepotname/...`.
 
 ## Usage
 
