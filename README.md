@@ -6,7 +6,7 @@ This tool can be used against a checkpoint file to perform a "deep rename" of a 
 
 ## Disclaimer
 
-This code is provided as-is, with no warranty. The author(s) take no responsbility for any damage it may do. Always take a back up of your Perforce instance before running this!
+This code is provided as-is, with no warranty. The author(s) take no responsbility for any damage it may do. Always take a back up of your Perforce instance before running this, and test the results thoroughly before going live!
 
 ## Limitations
 
