@@ -74,6 +74,10 @@ func main() {
 		log.Fatalf("-o not specified")
 		return
 	}
+	if _, err := os.Stat(*checkpointOutputFileName); !os.IsNotExist(err) {
+		log.Fatalf("%s already exists, cannot overwrite", *checkpointOutputFileName)
+		return
+	}
 
 	readerOut := make(chan JournalLine)
 	transOut := make(chan JournalLine)
