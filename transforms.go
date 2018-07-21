@@ -95,6 +95,8 @@ func transformer(t <-chan JournalLine, out chan<- JournalLine, fromDepot string,
 		}
 		if input.Parsed {
 			for idx, _ := range input.RowElems {
+				//appy transforms to each element if they have a
+				//transform defined for their table and column index
 				key := fmt.Sprintf("%s:%d", input.Table, idx)
 				if val, ok := Transforms[key]; ok {
 					input.RowElems[idx].applyTransform(
