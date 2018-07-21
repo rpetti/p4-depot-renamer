@@ -72,6 +72,7 @@ var (
 		"db.tamplatewx:8": pathTransform,
 		"db.trigger:3":    pathTransform,
 		"db.trigger:4":    pathTransform,
+		"db.trigger:6":    Transform{From: "%%//%s/", To: "%%//%s/"},
 		"db.view:4":       pathTransform,
 		"db.view.rp:4":    pathTransform,
 		"db.working:1":    pathTransform,
