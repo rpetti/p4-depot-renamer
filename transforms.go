@@ -7,20 +7,20 @@ import (
 var (
 	//% is repaced with the "from" or "to" depot name
 	pathTransform = Transform{
-		From: "//%s/",
+		From: "^//%s/",
 		To:   "//%s/",
 	}
 	identTransform = Transform{
-		From: "%s",
+		From: "^%s$",
 		To:   "%s",
 	}
-	//Transforms are indexed by the <db name>:<field index> where index enumerates from 0
+	//Transforms are indexed by the <db name>:<field index> where field index enumerates from 0
 	//fields are documented here: https://www.perforce.com/perforce/doc.current/schema/
 	Transforms = map[string]Transform{
 		"db.archmap:0":    pathTransform,
 		"db.archmap:1":    pathTransform,
 		"db.depot:0":      identTransform,
-		"db.depot:3":      Transform{From: "%s/", To: "%s/"},
+		"db.depot:3":      Transform{From: "^%s/", To: "%s/"},
 		"db.domain:0":     identTransform,
 		"db.excl:0":       identTransform,
 		"db.graphperm:0":  identTransform,
@@ -75,7 +75,7 @@ var (
 		"db.working:17":   pathTransform,
 		"db.workingg:1":   pathTransform,
 		"db.workingg:17":  pathTransform,
-		"db.workingx:0":   Transform{From: "//([0-9]+)/%s/", To: "//$1/%s/"},
+		"db.workingx:0":   Transform{From: "^//([0-9]+)/%s/", To: "//$1/%s/"},
 		"db.workingx:1":   pathTransform,
 		"db.workingx:17":  pathTransform,
 	}
