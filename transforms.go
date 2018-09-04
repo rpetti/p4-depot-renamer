@@ -75,6 +75,7 @@ var (
 		"db.trigger:3":    pathTransform,
 		"db.trigger:4":    pathTransform,
 		"db.trigger:6":    Transform{From: "%%//%s/", To: "%%//%s/"},
+		"db.user:2":       pathTransform,
 		"db.view:3":       pathTransform,
 		"db.view:4":       pathTransform,
 		"db.view.rp:3":    pathTransform,
