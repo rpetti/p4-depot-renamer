@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	eof = rune(0)
+	eof = byte(0)
 )
 
 //JournalElem individual journal elements
@@ -43,26 +43,26 @@ func (je *JournalElem) applyTransform(from string, to string) {
 	je.Data = re.ReplaceAllString(je.Data, to)
 }
 
-func (ls *lineScanner) read() rune {
-	r, _, err := ls.Reader.ReadRune()
+func (ls *lineScanner) read() byte {
+	r, err := ls.Reader.ReadByte()
 	if err != nil {
 		//probably an eof
 		r = '\n'
 	}
-	ls.Raw.WriteRune(r)
+	ls.Raw.WriteByte(r)
 	return r
 }
 
 func (ls *lineScanner) unread() {
 	ls.Raw.Truncate(ls.Raw.Len() - 1)
-	ls.Reader.UnreadRune()
+	ls.Reader.UnreadByte()
 }
 
-func isWhitespace(ch rune) bool {
+func isWhitespace(ch byte) bool {
 	return ch == ' ' || ch == '\t'
 }
 
-func isEndLine(ch rune) bool {
+func isEndLine(ch byte) bool {
 	return ch == '\n'
 }
 
@@ -78,7 +78,7 @@ func (ls *lineScanner) scanWhitespace() {
 	}
 }
 
-func isDelimiter(ch rune) bool {
+func isDelimiter(ch byte) bool {
 	return ch == '@'
 }
 
@@ -96,14 +96,14 @@ func (ls *lineScanner) scanString() (token JournalElem) {
 			nextCh := ls.read()
 			if isDelimiter(nextCh) {
 				//This is a "@@", write is as "@" in the data and keep going
-				buf.WriteRune(nextCh)
+				buf.WriteByte(nextCh)
 			} else {
 				//reached end delimiter
 				ls.unread()
 				break
 			}
 		} else {
-			buf.WriteRune(ch)
+			buf.WriteByte(ch)
 		}
 	}
 	return JournalElem{Data: buf.String(), Encapsulated: true}
@@ -119,7 +119,7 @@ func (ls *lineScanner) scanNakedElem() (token JournalElem) {
 			ls.unread()
 			break
 		} else {
-			buf.WriteRune(ch)
+			buf.WriteByte(ch)
 		}
 	}
 	return JournalElem{Data: buf.String(), Encapsulated: false}
