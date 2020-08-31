@@ -1,0 +1,12 @@
+- path_from: old_depot_first
+  path_to: new_depot/first
+  excluded_transforms:
+    - db.depot:0
+    - db.depot:3
+    - db.domain:0
+- path_from: old_depot_second
+  path_to: new_depot/second
+  excluded_transforms:
+    - db.depot:0
+    - db.depot:3
+    - db.domain:0

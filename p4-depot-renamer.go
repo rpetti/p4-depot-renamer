@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 )
 
 var (
@@ -13,6 +14,8 @@ var (
 	depotTo                  = flag.String("rename-to", "", "New name of the depot")
 	checkpointFileName       = flag.String("cp", "", "Checkpoint file to process")
 	checkpointOutputFileName = flag.String("o", "checkpoint.renamed", "Checkpoint file to write out")
+	batchArgumentsFileName   = flag.String("batch", "", "Path to the batch arguments - use instead of depot/rename-to")
+	forceOverwrite           = flag.Bool("f", false, "Overwrites the target file if exists")
 )
 
 func endOfFile(c chan<- JournalLine) {
@@ -58,11 +61,28 @@ func lineWriter(c <-chan JournalLine) {
 
 func main() {
 	flag.Parse()
-	if *depotFrom == "" {
+
+	var batchArguments []BatchArgument
+	var err error
+
+	if *batchArgumentsFileName != "" {
+		if *depotFrom != "" || *depotTo != "" {
+			log.Fatalf("please do not specify -depot or -rename-to if -batch is specified")
+			return
+		}
+
+		batchArguments, err = BatchArguments(*batchArgumentsFileName)
+		if err != nil {
+			log.Fatalf("error reading batch arguments: %v", err)
+			return
+		}
+	}
+
+	if *depotFrom == "" && len(batchArguments) == 0 {
 		log.Fatalf("-depot not specified")
 		return
 	}
-	if *depotTo == "" {
+	if *depotTo == "" && len(batchArguments) == 0 {
 		log.Fatalf("-rename-to not specified")
 		return
 	}
@@ -74,17 +94,32 @@ func main() {
 		log.Fatalf("-o not specified")
 		return
 	}
-	if _, err := os.Stat(*checkpointOutputFileName); !os.IsNotExist(err) {
-		log.Fatalf("%s already exists, cannot overwrite", *checkpointOutputFileName)
+	if strings.EqualFold(*checkpointFileName, *checkpointOutputFileName) {
+		log.Fatalf("files specified by -cp and -o cannot be the same")
 		return
 	}
 
+	if _, err := os.Stat(*checkpointOutputFileName); !os.IsNotExist(err) {
+		if !(*forceOverwrite) {
+			log.Fatalf("%s already exists, cannot overwrite", *checkpointOutputFileName)
+			return
+		}
+	}
+
+	if len(batchArguments) == 0 {
+		batchArguments = append(batchArguments, BatchArgument{
+			PathFrom:           *depotFrom,
+			PathTo:             *depotTo,
+			IncludedTransforms: []string{},
+			ExcludedTransforms: []string{},
+		})
+	}
+
 	log.Printf("will read and transform %s", *checkpointFileName)
-	log.Printf("renaming depot \"%s\" to \"%s\"...", *depotFrom, *depotTo)
 	readerOut := make(chan JournalLine)
 	transOut := make(chan JournalLine)
 	go readCheckpoint(readerOut)
-	go transformer(readerOut, transOut, *depotFrom, *depotTo)
+	go transformer(readerOut, transOut, batchArguments)
 	lineWriter(transOut)
 
 	log.Printf("transforms have been applied and saved to %s, you can now use it to restore your database", *checkpointOutputFileName)

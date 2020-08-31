@@ -22,7 +22,7 @@ var (
 		"db.change:7":     pathTransform,
 		"db.changex:7":    pathTransform,
 		"db.depot:0":      identTransform,
-		"db.depot:3":      Transform{From: "^%s/", To: "%s/"},
+		"db.depot:3":      {From: "^%s/", To: "%s/"},
 		"db.domain:0":     identTransform,
 		"db.excl:0":       pathTransform,
 		"db.graphperm:0":  identTransform,
@@ -69,12 +69,13 @@ var (
 		"db.revux:11":     pathTransform,
 		"db.sendq:3":      pathTransform,
 		"db.sendq:10":     pathTransform,
+		"db.storage:0":    pathTransform,
 		"db.template:7":   pathTransform,
 		"db.templatesx:8": pathTransform,
 		"db.tamplatewx:8": pathTransform,
 		"db.trigger:3":    pathTransform,
 		"db.trigger:4":    pathTransform,
-		"db.trigger:6":    Transform{From: "%%//%s/", To: "%%//%s/"},
+		"db.trigger:6":    {From: "%%//%s/", To: "%%//%s/"},
 		"db.user:2":       pathTransform,
 		"db.view:3":       pathTransform,
 		"db.view:4":       pathTransform,
@@ -84,7 +85,7 @@ var (
 		"db.working:17":   pathTransform,
 		"db.workingg:1":   pathTransform,
 		"db.workingg:17":  pathTransform,
-		"db.workingx:0":   Transform{From: "^//([0-9]+)/%s/", To: "//$1/%s/"},
+		"db.workingx:0":   {From: "^//([0-9]+)/%s/", To: "//$1/%s/"},
 		"db.workingx:1":   pathTransform,
 		"db.workingx:17":  pathTransform,
 	}
@@ -96,22 +97,35 @@ type Transform struct {
 	To   string
 }
 
-func transformer(t <-chan JournalLine, out chan<- JournalLine, fromDepot string, toDepot string) {
+func transformer(t <-chan JournalLine, out chan<- JournalLine, batchArguments []BatchArgument) {
 	for input := range t {
 		if input.EndOfFile {
 			out <- input
 			break
 		}
 		if input.Parsed {
-			for idx, _ := range input.RowElems {
-				//appy transforms to each element if they have a
-				//transform defined for their table and column index
+			for idx := range input.RowElems {
 				key := fmt.Sprintf("%s:%d", input.Table, idx)
-				if val, ok := Transforms[key]; ok {
-					input.RowElems[idx].applyTransform(
-						fmt.Sprintf(val.From, fromDepot),
-						fmt.Sprintf(val.To, toDepot),
-					)
+				for _, batchArgument := range batchArguments {
+					// If an inclusion map was specified, do not proceed if the transform key is not found
+					if len(batchArgument.IncludedTransformsMap) > 0 {
+						if !batchArgument.IncludedTransformsMap[key] {
+							continue
+						}
+						// If an exclusion map was specified, do not proceed if the transform key is found
+					} else if len(batchArgument.ExcludedTransformsMap) > 0 {
+						if batchArgument.ExcludedTransformsMap[key] {
+							continue
+						}
+					}
+					//appy transforms to each element if they have a
+					//transform defined for their table and column index
+					if val, ok := Transforms[key]; ok {
+						input.RowElems[idx].applyTransform(
+							fmt.Sprintf(val.From, batchArgument.PathFrom),
+							fmt.Sprintf(val.To, batchArgument.PathTo),
+						)
+					}
 				}
 			}
 		}
