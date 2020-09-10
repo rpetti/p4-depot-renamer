@@ -60,15 +60,15 @@ specifying either an inclusion list (only transforms in the list are applied) or
 For example, the following YAML allows to move multiple depots under a single one:
 
 ```
-- PathFrom: old_depot_first
-  PathTo: new_depot/first
-  ExcludedTransforms:
+- path_from: old_depot_first
+  path_to: new_depot/first
+  excluded_transforms:
     - db.depot:0
     - db.depot:3
     - db.domain:0
-- PathFrom: old_depot_second
-  PathTo: new_depot/second
-  ExcludedTransforms:
+- path_from: old_depot_second
+  path_to: new_depot/second
+  excluded_transforms:
     - db.depot:0
     - db.depot:3
     - db.domain:0
